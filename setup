@@ -136,7 +136,7 @@ check_and_install_dependencies() {
 
 build_project() {
   info "Configuring project with CMake and Ninja..."
-  cmake -B "$ROOT_DIR/build" -G Ninja
+  cmake -S "$ROOT_DIR" -B "$ROOT_DIR/build" -G Ninja
   info "Building daemon and CLI targets..."
   cmake --build "$ROOT_DIR/build"
   success "Build completed successfully."
@@ -212,7 +212,20 @@ deploy_plugin() {
 
   if command -v omarchy >/dev/null 2>&1; then
     info "Enabling plugin io.github.androydified.omasony in Omarchy..."
-    omarchy plugin enable io.github.androydified.omasony 2>/dev/null || true
+    # The shell answers "unknown" for a plugin it has not scanned yet, so
+    # rescan and wait for it to show up before enabling, as omarchy-plugin-add does.
+    omarchy-shell shell rescanPlugins >/dev/null 2>&1 || true
+    local attempt
+    for (( attempt = 0; attempt < 40; attempt++ )); do
+      if omarchy plugin list --json 2>/dev/null |
+        jq -e 'any(.[]; .id == "io.github.androydified.omasony")' >/dev/null 2>&1; then
+        break
+      fi
+      sleep 0.05
+    done
+    if ! omarchy plugin enable io.github.androydified.omasony; then
+      warn "Could not enable the plugin. Enable it later with: omarchy plugin enable io.github.androydified.omasony"
+    fi
   fi
 }
 
