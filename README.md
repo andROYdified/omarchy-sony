@@ -89,6 +89,21 @@ The `./setup` script will:
 4. Register and start the `sony-headphones.service` user systemd unit.
 5. Deploy the QML plugin to `~/.config/omarchy/plugins/io.github.androydified.omasony`.
 
+### Bar widget options
+
+Set options inline on the widget's entry in `~/.config/omarchy/shell.json`. The shell reloads them on save.
+
+| Option | Default | Effect |
+| --- | --- | --- |
+| `hideWhenDisconnected` | `false` | Hide the bar icon while the headphones are disconnected |
+
+```json
+{
+  "id": "io.github.androydified.omasony",
+  "hideWhenDisconnected": true
+}
+```
+
 ---
 
 ## CLI Usage (`sony-ctl`)

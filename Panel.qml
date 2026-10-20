@@ -28,8 +28,14 @@ Panel {
 
   readonly property var noiseModes: [Model.NOISE_ANC, Model.NOISE_AMBIENT, Model.NOISE_OFF]
 
+  // shell.json: { "id": "io.github.androydified.omasony", "hideWhenDisconnected": true }
+  readonly property bool hideWhenDisconnected: setting("hideWhenDisconnected", false) === true
+
+  visible: sony.connected || !hideWhenDisconnected
   implicitWidth: button.implicitWidth
   implicitHeight: button.implicitHeight
+
+  onVisibleChanged: if (!visible) root.close()
 
   Service {
     id: sony
